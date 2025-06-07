@@ -169,14 +169,15 @@ voxel:
 
     movzx eax, byte[mes+3]
     movzx ebx, byte[mes+2]
-    sub ebx, 65
-    sub eax, 65
 
-    imul eax, W_RES
-    add eax, ebx
+    sub eax, 65
+    sub ebx, 64
+
+    imul ecx, eax, W_RES
+    add ecx, ebx
 
     mov al, byte[mes+4]
-    mov byte[buf+eax], al
+    mov byte[buf+ecx], al
 
     jmp print
 
@@ -205,7 +206,7 @@ mov_up:
     syscall
 
     inc rbx
-    cmp rbx, H_RES+1
+    cmp rbx, H_RES+2
     jne .loop1
 
     ret
