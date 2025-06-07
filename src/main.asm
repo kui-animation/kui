@@ -2,6 +2,10 @@
 %define CREAT_F 64
 %define WRITE_F 1
 %define READ_F 0
+%define LINE_LEN 6
+%define H_RES 16
+%define W_RES 32
+%define RES 544
 
 
 %define SYS_WRITE 1
@@ -14,14 +18,14 @@
 %define STDOUT 1
 
 
-
 section .data
-file db "a", 0x0            ; set file to tmp file
+    file db "a", 0x0            ; set file to tmp file
+    mov_cur db 0x1b, "[1A"
 
 section .bss
     file_prt resb 8         ; reserve 64 bits for the file pointer
-    mes resb 32             ; reserve 32 byte for the mesige
-    char resb 1             ; reserve 1 byte for the char
+    mes resb LINE_LEN              ; reserve 5 byte for the mesige
+    buf resb RES+1
 
 section .text
 global _start
@@ -46,8 +50,11 @@ loop:
     mov rax, SYS_READ
     mov rdi, STDIN
     mov rsi, mes
-    mov rdx, 32
+    mov rdx, LINE_LEN
     syscall
+
+    cmp rax, LINE_LEN
+    jl start_exe
 
                             ; comper if mes is end
     cmp byte[mes], 'e'
@@ -89,20 +96,39 @@ exe_program:
                             ; read char in file
     mov rax, SYS_READ
     mov rdi, [file_prt]
-    mov rsi, char
-    mov rdx, 1
+    mov rsi, mes
+    mov rdx, LINE_LEN
     syscall
 
                             ; if end off file go to end_program
-    cmp rax, 0
-    je end_program
+    cmp rax, LINE_LEN
+    jl end_program
 
+    cmp byte[mes], 'v'
+    jne .next_str1
+    cmp byte[mes+1], 'o'
+    je voxel
+
+.next_str1:
+    cmp byte[mes], 's'
+    jne print
+    cmp byte[mes+1], 'b'
+    jne print
+    cmp byte[mes+2], 'u'
+    jne print
+    cmp byte[mes+3], 'f'
+    je sbuf
+
+print:
+    
                             ; write char to the terminal
     mov rax, SYS_WRITE
     mov rdi, STDOUT
-    mov rsi, char
-    mov rdx, 1
+    mov rsi, buf
+    mov rdx, RES
     syscall
+
+    call mov_up
 
     jmp exe_program         ; go to exe_program
 
@@ -124,3 +150,62 @@ end_program:
     mov rdi, 0
     syscall
 
+sbuf:
+    mov al, byte[mes+4]
+    mov rbx, 0
+.loop1:
+    
+    mov byte[buf+rbx], al
+
+    inc rbx
+    cmp rbx, RES
+    jne .loop1
+
+    call fix_buf
+
+    jmp print
+
+voxel:
+
+    movzx eax, byte[mes+3]
+    movzx ebx, byte[mes+2]
+    sub ebx, 65
+    sub eax, 65
+
+    imul eax, W_RES
+    add eax, ebx
+
+    mov al, byte[mes+4]
+    mov byte[buf+eax], al
+
+    jmp print
+
+fix_buf:
+    mov rbx, 0
+
+.loop1:
+    mov rax, rbx
+    imul rax, W_RES
+    mov byte[buf+rax], 0xA
+
+    inc rbx
+    cmp rbx, H_RES+1
+    jne .loop1
+
+    mov byte[buf+RES], 0x0
+    ret
+
+mov_up:
+    mov rbx, 0
+.loop1:
+    mov rax, SYS_WRITE
+    mov rdi, STDOUT
+    mov rsi, mov_cur
+    mov rdx, 4
+    syscall
+
+    inc rbx
+    cmp rbx, H_RES+1
+    jne .loop1
+
+    ret
