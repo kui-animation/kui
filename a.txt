@@ -1,0 +1,15 @@
+sbuf!
+print
+sleep
+voAA"
+sleep
+print
+voBA"
+sleep
+print
+voBB"
+sleep
+print
+voAB"
+sleep
+print
