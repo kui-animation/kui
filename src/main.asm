@@ -7,7 +7,7 @@
 %define W_RES 32
 %define RES 544
 
-
+%define SYS_SLEEP 35
 %define SYS_WRITE 1
 %define SYS_READ 0
 %define SYS_OPEN 2
@@ -19,18 +19,32 @@
 
 
 section .data
-    file db "a", 0x0            ; set file to tmp file
     mov_cur db 0x1b, "[1A"
+    sleep_time dq 0, 250000000
 
 section .bss
-    file_prt resb 8         ; reserve 64 bits for the file pointer
-    mes resb LINE_LEN              ; reserve 5 byte for the mesige
+    file_prt resb 8
+    mes resb LINE_LEN
+    new_file resb 2
     buf resb RES+1
+    file resb 16
 
 section .text
 global _start
 
 _start:
+
+    mov rax, SYS_READ
+    mov rdi, STDIN
+    mov rsi, new_file
+    mov rdx, 2
+    syscall
+
+    cmp byte[new_file], 'y'
+    je get_file_name
+
+    mov byte[file], 0x41
+    mov byte[file+1], 0x0
 
                             ; open a file
     mov rax, SYS_OPEN
@@ -39,10 +53,6 @@ _start:
     mov rdx, FILE_NUM
     syscall
     mov [file_prt], rax     ; set file pointer to the fd
-
-    ;---------------;
-    ; print to file ;
-    ;---------------;
 
 loop:
 
@@ -77,12 +87,24 @@ print_loop:
 
     jmp loop                ; go to start of loop
 
+
+get_file_name:
+    mov rax, SYS_READ
+    mov rdi, STDIN
+    mov rsi, file
+    mov rdx, 16
+    syscall
+    
+    mov byte[file+rax-1], 0x0
+    jmp open_file
+
 start_exe:
                             ; close file
     mov rax, SYS_CLOSE
     mov rdi, [file_prt]
-    syscall
+    syscall 
     
+open_file:
                             ; open it in read mode
     mov rax, SYS_OPEN
     mov rdi, file
@@ -111,13 +133,42 @@ exe_program:
 
 .next_str1:
     cmp byte[mes], 's'
-    jne print
+    jne .next_str2
     cmp byte[mes+1], 'b'
-    jne print
+    jne .next_str2
     cmp byte[mes+2], 'u'
-    jne print
+    jne .next_str2
     cmp byte[mes+3], 'f'
     je sbuf
+
+.next_str2:
+
+
+    cmp byte[mes], 's'
+    jne .next_str3
+    cmp byte[mes+1], 'l'
+    jne .next_str3
+    cmp byte[mes+2], 'e'
+    jne .next_str3
+    cmp byte[mes+3], 'e'
+    jne .next_str3
+    cmp byte[mes+4], 'p'
+    je sleep
+
+.next_str3:
+    cmp byte[mes], 'p'
+    jne .next_str4
+    cmp byte[mes+1], 'r'
+    jne .next_str4
+    cmp byte[mes+2], 'i'
+    jne .next_str4
+    cmp byte[mes+3], 'n'
+    jne .next_str4
+    cmp byte[mes+4], 't'
+    je print
+
+.next_str4:
+    jmp exe_program
 
 print:
     
@@ -163,7 +214,7 @@ sbuf:
 
     call fix_buf
 
-    jmp print
+    jmp exe_program
 
 voxel:
 
@@ -179,7 +230,16 @@ voxel:
     mov al, byte[mes+4]
     mov byte[buf+ecx], al
 
-    jmp print
+    jmp exe_program
+
+sleep:
+
+    mov rax, SYS_SLEEP
+    mov rdi, sleep_time
+    mov rsi, 0
+    syscall
+
+    jmp exe_program
 
 fix_buf:
     mov rbx, 0
@@ -206,7 +266,7 @@ mov_up:
     syscall
 
     inc rbx
-    cmp rbx, H_RES+2
+    cmp rbx, H_RES+1
     jne .loop1
 
     ret
