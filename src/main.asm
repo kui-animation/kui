@@ -3,9 +3,9 @@
 %define WRITE_F 1
 %define READ_F 0
 %define LINE_LEN 6
-%define H_RES 16
+%define H_RES 32
 %define W_RES 32
-%define RES 544
+%define RES 1024
 
 %define SYS_SLEEP 35
 %define SYS_WRITE 1
@@ -25,13 +25,16 @@ section .data                           ; defining constants
     lode_len equ $ - lode
     what_file db "what is the file name?", 0xA
     what_file_len equ $ - what_file
+    head db 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20, 0x0, 0x20, 0x0, 0x18, 0x20
 
 section .bss                            ; defining variables
     file_prt resb 8
+    img_prt resb 8
     mes resb LINE_LEN
     lode_file resb 2
-    buf resb RES+1
+    buf resb RES
     file resb 16
+    img_name resb 14
 
 section .text
 global _start
@@ -150,9 +153,9 @@ executing_program:
     cmp rax, LINE_LEN
     jl end_program
 
-    cmp byte[mes], 'v'
+    cmp byte[mes], 'p'
     jne .next_str1
-    cmp byte[mes+1], 'o'
+    cmp byte[mes+1], 'i'
     je VOXEL
 
 .next_str1:
@@ -189,22 +192,9 @@ executing_program:
     cmp byte[mes+3], 'n'
     jne .next_str4
     cmp byte[mes+4], 't'
-    je print
+    je DRAW_IMG
 
 .next_str4:
-    jmp executing_program
-
-print:
-    
-                                        ; write char to the terminal
-    mov rax, SYS_WRITE
-    mov rdi, STDOUT
-    mov rsi, buf
-    mov rdx, RES
-    syscall
-
-    call MOVEUP
-
     jmp executing_program
 
 
@@ -236,16 +226,14 @@ skip_removeing_file:
 
 SBUF:
     mov al, byte[mes+4]
+    add al, al
     mov rbx, 0
 .loop1:
-    
     mov byte[buf+rbx], al
 
     inc rbx
     cmp rbx, RES
     jne .loop1
-
-    call FIXBUF
 
     jmp executing_program
 
@@ -266,44 +254,79 @@ VOXEL:
     movzx ebx, byte[mes+2]
 
     sub eax, 65
-    sub ebx, 64
+    sub ebx, 65
 
     imul ecx, eax, W_RES
     add ecx, ebx
 
     mov al, byte[mes+4]
+    add al, al
     mov byte[buf+ecx], al
 
     jmp executing_program
 
 
-MOVEUP:
-    mov rbx, 0
-.loop1:
+DRAW_IMG:
+    mov rax, SYS_READ
+    mov rdi, [file_prt]
+    lea rsi, [img_name+4]
+    mov rdx, LINE_LEN
+    syscall
+
+    mov byte[img_name], 'i'
+    mov byte[img_name+1], 'm'
+    mov byte[img_name+2], 'g'
+    mov byte[img_name+3], '/'
+
+    mov byte[img_name+LINE_LEN+3], '.'
+    mov byte[img_name+LINE_LEN+4], 't'
+    mov byte[img_name+LINE_LEN+5], 'g'
+    mov byte[img_name+LINE_LEN+6], 'a'
+    mov byte[img_name+LINE_LEN+7], 0x0
+
+    mov rax, SYS_OPEN
+    mov rdi, img_name
+    mov rsi, WRITE_F | CREAT_F
+    mov rdx, FILE_NUM
+    syscall
+
+    mov [img_prt], rax
+
     mov rax, SYS_WRITE
-    mov rdi, STDOUT
-    mov rsi, mov_cur
-    mov rdx, 4
+    mov rdi, [img_prt]
+    mov rsi, head
+    mov rdx, 18
+    syscall
+
+    mov rbx, 0
+
+.loop1:
+
+    mov rax, SYS_WRITE
+    mov rdi, [img_prt]
+    lea rsi, [buf+rbx]
+    mov rdx, 1
+    syscall
+
+    mov rax, SYS_WRITE
+    mov rdi, [img_prt]
+    lea rsi, [buf+rbx]
+    mov rdx, 1
+    syscall
+
+    mov rax, SYS_WRITE
+    mov rdi, [img_prt]
+    lea rsi, [buf+rbx]
+    mov rdx, 1
     syscall
 
     inc rbx
-    cmp rbx, H_RES+1
+    cmp rbx, RES
     jne .loop1
 
-    ret
+    mov rax, SYS_CLOSE
+    mov rdi, [img_prt]
+    syscall
 
 
-FIXBUF:
-    mov rbx, 0
-
-.loop1:
-    mov rax, rbx
-    imul rax, W_RES
-    mov byte[buf+rax], 0xA
-
-    inc rbx
-    cmp rbx, H_RES+1
-    jne .loop1
-
-    mov byte[buf+RES], 0x0
-    ret
+    jmp executing_program
