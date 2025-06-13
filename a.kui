@@ -1,0 +1,11 @@
+sbuf!
+print 00001
+sAACz print 00002
+sAAC! sBBCz print 00003
+sBBC! sCCCz print 00004
+sCCC! sDDCz print 00005
+sDDC! sEECz print 00006
+sEEC! sFFCz print 00007
+sFFC! sGGCz print 00010
+sGGC! sHHCz print 00011
+sHHC! sIICz print 00012

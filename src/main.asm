@@ -7,7 +7,6 @@
 %define W_RES 32
 %define RES 1024
 
-%define SYS_SLEEP 35
 %define SYS_WRITE 1
 %define SYS_READ 0
 %define SYS_OPEN 2
@@ -170,31 +169,24 @@ executing_program:
 
 .next_str2:
 
-
-    cmp byte[mes], 's'
-    jne .next_str3
-    cmp byte[mes+1], 'l'
-    jne .next_str3
-    cmp byte[mes+2], 'e'
-    jne .next_str3
-    cmp byte[mes+3], 'e'
-    jne .next_str3
-    cmp byte[mes+4], 'p'
-    je SLEEP
-
-.next_str3:
     cmp byte[mes], 'p'
-    jne .next_str4
+    jne .next_str3
     cmp byte[mes+1], 'r'
-    jne .next_str4
+    jne .next_str3
     cmp byte[mes+2], 'i'
-    jne .next_str4
+    jne .next_str3
     cmp byte[mes+3], 'n'
-    jne .next_str4
+    jne .next_str3
     cmp byte[mes+4], 't'
     je DRAW_IMG
 
+.next_str3:
+    cmp byte[mes], 's'
+    je SQUARE
+
 .next_str4:
+
+
     jmp executing_program
 
 
@@ -234,16 +226,6 @@ SBUF:
     inc rbx
     cmp rbx, RES
     jne .loop1
-
-    jmp executing_program
-
-
-SLEEP:
-
-    mov rax, SYS_SLEEP
-    mov rdi, sleep_time
-    mov rsi, 0
-    syscall
 
     jmp executing_program
 
@@ -330,3 +312,37 @@ DRAW_IMG:
 
 
     jmp executing_program
+
+SQUARE:
+    movzx edx, byte[mes+3]
+    sub edx, 64
+.loop1:
+    movzx edi, byte[mes+3]
+    sub edi, 64
+.loop2:
+    movzx eax, byte[mes+2]
+    movzx ebx, byte[mes+1]
+    sub eax, 66
+    sub ebx, 66
+
+    add eax, edi
+    add ebx, edx
+
+    imul ecx, eax, W_RES
+    add ecx, ebx
+
+    mov al, byte[mes+4]
+    add al, al
+    mov byte[buf+ecx], al
+
+    dec edi
+    cmp edi, 0
+    jne .loop2
+
+    dec edx
+    cmp edx, 0
+    jne .loop1
+
+    jmp executing_program
+
+
