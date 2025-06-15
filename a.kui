@@ -1,11 +1,103 @@
-sbuf!
+col~~
+sstem
+col00
+spiAA spiBA spiCA spiDA spiEA spiFA spiGA spiHA
+spiAB spiDB spiEB spiHB
+spiAC spiGC spiHC
+spiAD spiBD spiGD spiHD
+spiAE spiGD spiHE
+spiAF spiHF
+spiAG spiBG spiHG
+spiAH spiBH spiCH spiDH spiEH spiFH spiGH spiHH
+/////
+sbuff
+stmAA
 print 00001
-sAACz print 00002
-sAAC! sBBCz print 00003
-sBBC! sCCCz print 00004
-sCCC! sDDCz print 00005
-sDDC! sEECz print 00006
-sEEC! sFFCz print 00007
-sFFC! sGGCz print 00010
-sGGC! sHHCz print 00011
-sHHC! sIICz print 00012
+rAAGG
+stmBA
+print 00002
+rBAGG
+stmCA
+print 00003
+rCAGG
+stmDA
+print 00004
+rDAGG
+stmEA
+print 00005
+rEAGG
+stmFA
+print 00006
+rFAGG
+stmGA
+print 00007
+rGAGG
+stmHA
+print 00008
+print 00009
+print 00010
+rHAGG
+stmHB
+print 00011
+rHBGG
+stmHC
+print 00012
+rHCGG
+stmHD
+print 00013
+rHDGG
+stmHE
+print 00014
+rHEGG
+stmHF
+print 00015
+print 00016
+print 00017
+print 00018
+rHFGG
+stmIF
+print 00019
+rIFGG
+stmJF
+print 00020
+rJFGG
+stmKF
+print 00021
+rKFGG
+print 00022
+print 00023
+print 00024
+col~~
+pixAA print 00025
+pixAB print 00026
+pixAC print 00027
+pixAD print 00028
+pixAE print 00029
+pixAF print 00030
+pixAG print 00031
+pixAH print 00032
+pixAI print 00033
+pixAJ print 00034
+pixAK print 00035
+pixAL print 00036
+pixBL print 00037
+pixCL print 00038
+pixDL print 00039
+pixEL print 00040
+pixFL print 00041 print 00042
+pixGL print 00043
+pixHL print 00044
+pixHM print 00045
+pixIM print 00046
+pixIN print 00047
+pixJN print 00048
+pixJO print 00049
+pixKO print 00050
+pixLO print 00051
+pixMO print 00052
+pixNO print 00053
+col00
+sbuff
+print 00054
+print 00055
+print 00056

@@ -27,6 +27,7 @@ section .data                           ; defining constants
     head db 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x20, 0x0, 0x20, 0x0, 0x18, 0x20
 
 section .bss                            ; defining variables
+    color resb 1
     file_prt resb 8
     img_prt resb 8
     mes resb LINE_LEN
@@ -34,6 +35,7 @@ section .bss                            ; defining variables
     buf resb RES
     file resb 16
     img_name resb 14
+    stemp resb 64
 
 section .text
 global _start
@@ -155,6 +157,8 @@ executing_program:
     cmp byte[mes], 'p'
     jne .next_str1
     cmp byte[mes+1], 'i'
+    jne .next_str1
+    cmp byte[mes+2], 'x'
     je VOXEL
 
 .next_str1:
@@ -165,6 +169,8 @@ executing_program:
     cmp byte[mes+2], 'u'
     jne .next_str2
     cmp byte[mes+3], 'f'
+    jne .next_str2
+    cmp byte[mes+4], 'f'
     je SBUF
 
 .next_str2:
@@ -181,11 +187,46 @@ executing_program:
     je DRAW_IMG
 
 .next_str3:
-    cmp byte[mes], 's'
+    cmp byte[mes], 'r'
     je SQUARE
 
 .next_str4:
+    cmp byte[mes], 's'
+    jne .next_str5
+    cmp byte[mes+1], 't'
+    jne .next_str5
+    cmp byte[mes+2], 'm'
+    je STEMP
 
+.next_str5:
+    cmp byte[mes], 's'
+    jne .next_str6
+    cmp byte[mes+1], 's'
+    jne .next_str6
+    cmp byte[mes+2], 't'
+    jne .next_str6
+    cmp byte[mes+3], 'e'
+    jne .next_str6
+    cmp byte[mes+4], 'm'
+    je SSTEMP
+
+.next_str6:
+    cmp byte[mes], 's'
+    jne .next_str7
+    cmp byte[mes+1], 'p'
+    jne .next_str7
+    cmp byte[mes+2], 'i'
+    je SVOXEL
+
+.next_str7:
+    cmp byte[mes], 'c'
+    jne .next_str8
+    cmp byte[mes+1], 'o'
+    jne .next_str8
+    cmp byte[mes+2], 'l'
+    je SETCOLOR
+
+.next_str8:
 
     jmp executing_program
 
@@ -215,11 +256,17 @@ skip_removeing_file:
 ; FUNCTIONS ;
 ;-----------;
 
+SETCOLOR:
+    mov al, byte[mes+3]
+    mov bl, byte[mes+4]
+    add bl, al
+    mov [color], bl
+
+    jmp executing_program
 
 SBUF:
-    mov al, byte[mes+4]
-    add al, al
     mov rbx, 0
+    mov al, [color]
 .loop1:
     mov byte[buf+rbx], al
 
@@ -229,11 +276,38 @@ SBUF:
 
     jmp executing_program
 
+SSTEMP:
+    mov rbx, 0
+    mov al, [color]
+.loop1:
+    mov byte[stemp+rbx], al
+    
+    inc rbx
+    cmp rbx, 64
+    jne .loop1
+
+    jmp executing_program
+
+SVOXEL:
+    movzx eax, byte[mes+4]
+    movzx ebx, byte[mes+3]
+
+    sub eax, 65
+    sub ebx, 65
+
+    imul ecx, eax, 8
+    add ecx, ebx
+
+    mov al, [color]
+    mov byte[stemp+ecx], al
+
+    jmp executing_program
+
 
 VOXEL:
 
-    movzx eax, byte[mes+3]
-    movzx ebx, byte[mes+2]
+    movzx eax, byte[mes+4]
+    movzx ebx, byte[mes+3]
 
     sub eax, 65
     sub ebx, 65
@@ -241,8 +315,7 @@ VOXEL:
     imul ecx, eax, W_RES
     add ecx, ebx
 
-    mov al, byte[mes+4]
-    add al, al
+    mov al, [color]
     mov byte[buf+ecx], al
 
     jmp executing_program
@@ -317,7 +390,7 @@ SQUARE:
     movzx edx, byte[mes+3]
     sub edx, 64
 .loop1:
-    movzx edi, byte[mes+3]
+    movzx edi, byte[mes+4]
     sub edi, 64
 .loop2:
     movzx eax, byte[mes+2]
@@ -331,8 +404,7 @@ SQUARE:
     imul ecx, eax, W_RES
     add ecx, ebx
 
-    mov al, byte[mes+4]
-    add al, al
+    mov al, [color]
     mov byte[buf+ecx], al
 
     dec edi
@@ -345,4 +417,36 @@ SQUARE:
 
     jmp executing_program
 
+STEMP:
+    mov edx, 0
+.loop1:
+    mov edi, 0
+.loop2:
+    movzx eax, byte[mes+4]
+    movzx ebx, byte[mes+3]
+    sub eax, 65
+    sub ebx, 65
 
+    add eax, edi
+    add ebx, edx
+
+    imul r8d, edi, 8
+    add r8d, edx
+
+    mov ecx, 0
+
+    imul ecx, eax, W_RES
+    add ecx, ebx
+
+    mov al, byte[stemp+r8d]
+    mov byte[buf+ecx], al
+
+    inc edi
+    cmp edi, 8
+    jne .loop2
+
+    inc edx
+    cmp edx, 8
+    jne .loop1
+
+    jmp executing_program

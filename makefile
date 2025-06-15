@@ -7,7 +7,7 @@ SRCDIRS = src
 
 SRCS := $(wildcard $(addsuffix /*.asm, $(SRCDIRS)))
 OBJS = $(SRCS:.asm=.o)
-TARGET = app
+TARGET = kui
 
 all: $(TARGET)
 
