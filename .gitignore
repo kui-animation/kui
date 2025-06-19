@@ -1,3 +1,2 @@
 kui
-src/*.o
-img/
+src/bin/

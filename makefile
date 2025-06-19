@@ -1,21 +1,21 @@
-# Specify the assembler and its flags
-ASM = nasm
-AMFLAGS = -f elf64
-LD = ld
-LDFLAGS =
-SRCDIRS = src
-
-SRCS := $(wildcard $(addsuffix /*.asm, $(SRCDIRS)))
-OBJS = $(SRCS:.asm=.o)
+CC = gcc
+CFLAGS = 
+SRC_DIR = src
+OBJ_DIR = $(SRC_DIR)/bin
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 TARGET = kui
 
-all: $(TARGET)
-
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
-%.o: %.asm
-	$(ASM) $(AMFLAGS) $< -o $@
+# Compile each .c file into an object file in bin/
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+
