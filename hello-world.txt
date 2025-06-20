@@ -1,7 +1,8 @@
-pix
-col
-r
+col~~
 sbuff
-stm
-sstem
-spi
+col00
+pixAA
+pixAB
+pixAC
+print
+
