@@ -1,0 +1,7 @@
+pix
+col
+r
+sbuff
+stm
+sstem
+spi
