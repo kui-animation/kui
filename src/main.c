@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     uint32_t line_index = 0;
+    uint32_t image_num = 1;
     uint8_t color = 0;
     memset(buf, (char)color, RES);
     while (fgets(line, 7, file)) {
@@ -45,8 +46,11 @@ int main(int argc, char *argv[]) {
             printf("%d\n", line_index);
             break;
         case PRINT:
-            draw_image(buf, "img.tga", RES_H);
+            uint8_t name[16];
+            sprintf(name, "img/%d.tga", image_num);
+            draw_image(buf, name,  RES_H);
             printf("%d print\n", line_index);
+            image_num ++;
             break;
         case COL:
             color = line[3]+line[4];
