@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+
 #define RES_H 32
 #define RES_W 32
 #define RES RES_H*RES_W

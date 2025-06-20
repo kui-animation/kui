@@ -20,6 +20,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "coden alocat memory to buf\n");
         return 1;
     }
+    uint8_t* stemp = malloc(64*sizeof(uint8_t));
+    if (!stemp) {
+        free(buf);
+        free(line);
+        fprintf(stderr, "coden alocat memory to buf\n");
+        return 1;
+    }
 
 
     FILE* file = fopen(argv[1], "r");
@@ -38,7 +45,7 @@ int main(int argc, char *argv[]) {
             printf("%d\n", line_index);
             break;
         case PRINT:
-            draw_image(buf, "img.tga", RES);
+            draw_image(buf, "img.tga", RES_H);
             printf("%d print\n", line_index);
             break;
         case COL:
@@ -46,11 +53,11 @@ int main(int argc, char *argv[]) {
             printf("%d color\n", line_index);
             break;
         case R:
-            //rectengle(buf, line[1]-65,line[2]-65,line[3]-65,line[4]-65, color);
+            draw_rectengle(buf, line[1]-65,line[2]-65,line[3]-64,line[4]-64, color, RES_W);
             printf("%d rect\n", line_index);
             break;
         case PIX:
-            draw_pixle(buf, (int)line[3]-65, (int)line[4]-65, color);
+            draw_pixle(buf, (int)line[3]-65, (int)line[4]-65, color, RES_W);
             printf("%d pixel\n", line_index);
             break;
         case SBUFF:
@@ -58,12 +65,15 @@ int main(int argc, char *argv[]) {
             printf("%d set buffer\n", line_index);
             break;
         case STM:
+            draw_stemp(stemp, buf,  (int)line[3]-65, (int)line[4]-65, 8, RES_W);
             printf("%d stemp\n", line_index);
             break;
         case SSTEM:
+            memset(stemp, (char)color, 64);
             printf("%d set stemp\n", line_index);
             break;
         case SPI:
+            draw_pixle(stemp, (int)line[3]-65, (int)line[4]-65, color, 8);
             printf("%d setmp pixel\n", line_index);
             break;
         }
@@ -71,6 +81,7 @@ int main(int argc, char *argv[]) {
     }
 
     free(line);
+    free(stemp);
     free(buf);
     fclose(file);
     

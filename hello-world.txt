@@ -1,8 +1,12 @@
 col~~
 sbuff
+sstem
 col00
-pixAA
-pixAB
-pixAC
+spiAA
+spiBA
+spiCA
+spiDA
+spiDB
+spiDC
+stmAA
 print
-
