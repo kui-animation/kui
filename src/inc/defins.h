@@ -6,22 +6,28 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
+#include <math.h>
 
+enum Res {
+    LOW = 32,
+    MEDIUM = 64,
+    HIGH = 128
+};
+#define PI 3.14159265359
 
-#define RES_H 32
-#define RES_W 32
-#define RES RES_H*RES_W
-
-#define COL 1
-#define R 2
-#define PIX 3
-#define PRINT 4
-#define SBUFF 5
-#define STM 6
-#define SSTEM 7
-#define SPI 8
-#define NO 9
-
+#define COMAD_SIZE 11
+#define DYR 1
+#define DYG 2
+#define DYB 3
+#define R 4
+#define PIX 5
+#define PRINT 6
+#define SBUFF 7
+#define STM 8
+#define SSTEM 9
+#define SPI 10
+#define M 11
+#define NO 0
 
 
 #endif
