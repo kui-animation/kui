@@ -5,6 +5,7 @@ uint8_t pars_file(uint8_t* line) {
         {"dyR"},
         {"dyG"},
         {"dyB"},
+        {"bleck"},
         {"r"},
         {"pix"},
         {"print"},

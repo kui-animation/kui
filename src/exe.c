@@ -25,7 +25,12 @@ void draw_image(uint8_t* buf, const uint8_t *name, uint8_t res) {
 }
 
 void draw_pixle(uint8_t* buf, uint8_t x, uint8_t y, uint8_t* color, uint16_t res_w) {
-
+    if (x >= res_w) {
+        return;
+    }
+    if (y >= res_w) {
+        return;
+    }
     uint16_t offset = (res_w*y)+x;
     buf[offset*3] = color[2];
     buf[offset*3+1] = color[1];
@@ -89,15 +94,16 @@ void draw_points(uint8_t* buf, uint8_t* name, uint8_t* color, uint16_t res_w) {
             continue; // skip invalid lines
         }
 
-        v[line_number * 3 + 0] = x*10;
-        v[line_number * 3 + 1] = -y*10;
-        v[line_number * 3 + 2] = z*10;
+        uint8_t size_inc = 10;
+        v[line_number * 3 + 0] = x*size_inc;
+        v[line_number * 3 + 1] = -y*size_inc;
+        v[line_number * 3 + 2] = z*size_inc;
 
         line_number ++;
     }
     fclose(obj);
 
-    float r_angle = 23.5*(PI/180.0);
+    float r_angle = 23.5f*(PI/180.0f);
     for (int i = 0; i < line_number; i++) {
         float tmp_x = v[i*3];
         float tmp_y = v[i*3+1];

@@ -15,18 +15,19 @@ enum Res {
 };
 #define PI 3.14159265359
 
-#define COMAD_SIZE 11
+#define COMAD_SIZE 12
 #define DYR 1
 #define DYG 2
 #define DYB 3
-#define R 4
-#define PIX 5
-#define PRINT 6
-#define SBUFF 7
-#define STM 8
-#define SSTEM 9
-#define SPI 10
-#define M 11
+#define DYBLE 4
+#define R 5
+#define PIX 6
+#define PRINT 7
+#define SBUFF 8
+#define STM 9
+#define SSTEM 10
+#define SPI 11
+#define M 12
 #define NO 0
 
 

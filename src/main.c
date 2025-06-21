@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
     }
 
     if (strcmp(argv[2], "--no-conf") == 0) {
-        res_w = 128;
-        res_h = 128;
+        res_w = HIGH;
+        res_h = HIGH;
         res = res_h*res_w;
     }
 
@@ -70,6 +70,12 @@ int main(int argc, char *argv[]) {
         case DYB:
             color[2] = line[3]+line[4];
             printf("%d color_B: %d\n", line_index, color[2]);
+            break;
+        case DYBLE:
+            for (uint8_t i = 0; i < 3; i++) {
+                color[i] = 0;
+            }
+            printf("%d color_all: %d\n", line_index, 0);
             break;
         case R:
             draw_rectengle(buf, line[1]-65,line[2]-65,line[3]-64,line[4]-64, color, res_w);
