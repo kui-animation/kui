@@ -1,21 +1,34 @@
-# Specify the assembler and its flags
-ASM = nasm
-AMFLAGS = -f elf64
-LD = ld
-LDFLAGS =
-SRCDIRS = src
+# Compiler and flags
+CC = gcc
+CFLAGS = 
 
-SRCS := $(wildcard $(addsuffix /*.asm, $(SRCDIRS)))
-OBJS = $(SRCS:.asm=.o)
-TARGET = kui
+# Libraries
+LIBS = 
 
-all: $(TARGET)
+# Directories
+SRC_DIR = src
+OBJ_DIR = bin
+BIN = kui
 
-$(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+# Find all .c files in src/
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
-%.o: %.asm
-	$(ASM) $(AMFLAGS) $< -o $@
+# Default rule
+all: $(BIN)
 
+# Create binary
+$(BIN): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LIBS)
+
+# Compile .c to .o
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean rule
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(OBJ_DIR) $(BIN)
+
+# Phony targets
+.PHONY: all clean
