@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = 
+CFLAGS = -std=c99
 
 # Libraries
 LIBS = 
